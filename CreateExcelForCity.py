@@ -11,9 +11,7 @@ PASSWORD = 'IV9PCi6eyzE7W9PHy5gF'
 
 # Elasticsearch connection setup with Basic Auth
 es = Elasticsearch(['http://35.224.91.31:9200'],
-                   http_auth=(USERNAME, PASSWORD),
-                   scheme='http',
-                   port=9200,
+                   basic_auth=(USERNAME, PASSWORD),
                    verify_certs=False)
 
 # Define index and keys
@@ -76,7 +74,7 @@ print(f"Total documents retrieved: {total_docs}")
 for row in output:
     sheet.append(row)
 
-workbook.save(filename="output2.xlsx")
+workbook.save(filename="output3.xlsx")
 
 
 
