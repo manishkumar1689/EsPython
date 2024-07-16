@@ -17,7 +17,7 @@ es = Elasticsearch(['http://35.224.91.31:9200'],
 # Define index and keys
 index = "smartfill-location-suggest-v1"
 keys = ["id", "name_en-us", "name_zh-cn", "name_zh-tw",
-        "name_ja-jp", "name_ko-kr", "name_th-th", "name_id-id"]
+        "name_ja-jp", "name_ko-kr","name_vi-vn", "name_th-th", "name_id-id"]
 
 # Define batch size and initial parameters
 batch_size = 10000  # Adjust batch size as needed for your system's capacity
@@ -37,7 +37,7 @@ try:
     # Perform initial search
     results = es.search(index=index, body=query, scroll='5m')
 
-    print(type results)
+
     # Check response format and obtain scroll_id
     if isinstance(results, dict):
         scroll_id = results.get('_scroll_id', None)

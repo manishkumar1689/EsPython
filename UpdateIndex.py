@@ -18,16 +18,14 @@ PASSWORD = 'IV9PCi6eyzE7W9PHy5gF'
 
 # Elasticsearch connection setup with Basic Auth
 es = Elasticsearch(['http://35.224.91.31:9200'],
-                   http_auth=(USERNAME, PASSWORD),
-                   scheme='http',
-                   port=9200,
+                   basic_auth=(USERNAME, PASSWORD),
                    verify_certs=False)
 
 # Excel file path
-file_path = 'output.xlsx'
+file_path = 'output4.xlsx'
 
 # Read Excel data into a DataFrame
-df = pd.read_excel(file_path, header=None, engine='openpyxl')
+df = pd.read_excel(file_path)
 
 # Convert DataFrame to dictionary (HashMap)
 #data_dict = dict(zip(df.iloc[:, 0], df.iloc[:, 1]))
@@ -47,10 +45,13 @@ for index, row in df.iterrows():
         inner_map["name_ja-jp"] = row['name_ja-jp']
     if 'name_ko-kr' in df.columns:
         inner_map["name_ko-kr"] = row['name_ko-kr']
+    if 'name_vi-vn' in df.columns:
+        inner_map["name_ko-kr"] = row['name_vi-vn']
     if 'name_th-th' in df.columns:
         inner_map["name_th-th"] = row['name_th-th']
     if 'name_id-id' in df.columns:
         inner_map["name_id-id"] = row['name_id-id']
+    # print(f"row : {row}")
     map_of_map[row['id']] = inner_map
 
 # Elasticsearch index and query setup
@@ -116,29 +117,49 @@ while True:
                 # Define fields to check and update
                 fields_to_update = [
                     # "keyword_full_name_en-us",
-                    "keyword_full_name_zh-cn",
-                    "keyword_full_name_zh-tw",
-                    "keyword_full_name_ja-jp",
-                    "keyword_full_name_ko-kr",
-                    "keyword_full_name_th-th",
-                    "keyword_full_name_id-id"
+                    "custom_keyword_full_name_zh-cn",
+                    "custom_keyword_full_name_zh-tw",
+                    "custom_keyword_full_name_ja-jp",
+                    "custom_keyword_full_name_ko-kr",
+                    "custom_keyword_full_name_vi-vn",
+                    "custom_keyword_full_name_th-th",
+                    "custom_keyword_full_name_id-id"
                 ]
 
                 keyValue = {
                     # "keyword_full_name_en-us": "full_name_en-us",
-                    "keyword_full_name_zh-cn": "full_name_zh-cn",
-                    "keyword_full_name_zh-tw": "full_name_zh-tw",
-                    "keyword_full_name_ja-jp": "full_name_ja-jp",
-                    "keyword_full_name_ko-kr": "name_ko-kr",
-                    "keyword_full_name_th-th": "name_th-th",
-                    "keyword_full_name_id-id": "name_id-id"
+                    "custom_keyword_full_name_zh-cn": "full_name_zh-cn",
+                    "custom_keyword_full_name_zh-tw": "full_name_zh-tw",
+                    "custom_keyword_full_name_ja-jp": "full_name_ja-jp",
+                    "custom_keyword_full_name_ko-kr": "full_name_ko-kr",
+                    "custom_keyword_full_name_vi-vn": "full_name_vi-vn",
+                    "custom_keyword_full_name_th-th": "full_name_th-th",
+                    "custom_keyword_full_name_id-id": "full_name_id-id"
+                }
+
+                keyValueDic = {
+                    # "keyword_full_name_en-us": "full_name_en-us",
+                    "custom_keyword_full_name_zh-cn": "name_zh-cn",
+                    "custom_keyword_full_name_zh-tw": "name_zh-tw",
+                    "custom_keyword_full_name_ja-jp": "name_ja-jp",
+                    "custom_keyword_full_name_ko-kr": "name_ko-kr",
+                    "custom_keyword_full_name_vi-vn": "name_vi-vn",
+                    "custom_keyword_full_name_th-th": "name_th-th",
+                    "custom_keyword_full_name_id-id": "name_id-id"
                 }
 
                 # Iterate over fields and add to update_doc if they have a value
                 for field in fields_to_update:
-                    value = doc_a["_source"].get(field)
-                    if value and additional_info[keyValue[field]]:  # Check if the value is not None or empty
-                        update_doc["doc"][field] = f"{value}, {additional_info[keyValue[field]]}"
+                    value = doc_a["_source"].get(keyValue[field])
+                    print(f"additional_info : {additional_info}")
+                    print("where are you")
+                    print(f"keyValue : {keyValue[field]}")
+                    print(f"value : {value}")
+                    print(f"field : {field}")
+                    print(f"doc_a source : {doc_a['_source']}")
+                    if value and additional_info[keyValueDic[field]]:  # Check if the value is not None or empty
+                        update_doc["doc"][field] = f"{value}, {additional_info[keyValueDic[field]]}"
+                        print(f"update_doc : {field}")
 
                 if update_doc["doc"]:  # Only append if there are fields to update
                     logger.debug(f"Prepared update: {update_doc}")
