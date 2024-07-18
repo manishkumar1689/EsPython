@@ -12,8 +12,7 @@ def get_mongo_data():
         escaped_username = quote_plus(username)
         escaped_password = quote_plus(password)
 
-        #uri = (f"mongodb+srv://catalog-user:CDdtEQ1JiXpmt9UQ@hotels-mongodb-pri.lbxrj.mongodb.net/catalog_hotel?retryWrites=true&w=majority&readPreference=secondary")
-        uri = ""
+         uri = ""
         print("here I am")
         # Create a new client and connect to the server
         client = MongoClient(uri, server_api=ServerApi('1'))
